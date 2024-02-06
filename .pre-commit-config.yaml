@@ -31,7 +31,9 @@ repos:
     - id: mypy
       additional_dependencies:
         - fastapi==0.109.2
-        - pydantic==2.6.1 --extra dotenv
+        - pydantic==2.6.1
+        - dotenv
+        - pydantic-settings==2.1.0
         - passlib==1.7.4
         - asyncpg==0.29.0
         - psycopg2-binary==2.9.9
