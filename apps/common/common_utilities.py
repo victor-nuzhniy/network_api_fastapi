@@ -3,7 +3,6 @@ from datetime import datetime
 
 from fastapi import HTTPException, status
 from jose import jwt
-from pydantic import BaseModel
 from pytz import utc
 from sqlalchemy import DATETIME, TypeDecorator
 from typing_extensions import Type
@@ -42,7 +41,7 @@ class AwareDateTime(TypeDecorator):
         return dt_value.replace(tzinfo=utc)
 
 
-def get_token_data(token: str) -> BaseModel:
+def get_token_data(token: str) -> TokenPayload:
     """Get token data, using token."""
     payload = jwt.decode(
         token,
