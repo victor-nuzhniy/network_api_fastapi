@@ -43,6 +43,7 @@ repos:
         - cryptography==42.0.2
         - python-jose==3.3.0
         - pytz==2024.1
+        - types-pytz
         - mypy==1.8.0
       name: mypy
       entry: mypy
