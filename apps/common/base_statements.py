@@ -6,7 +6,7 @@ from typing_extensions import Optional, Type, Union
 from apps.common.common_types import ModelType, SchemaType
 
 
-class BaseCRUDStatements(object):
+class AsyncBaseCRUDStatements(object):
     """Base model CRUD statements."""
 
     def __init__(self, *, model: Type[ModelType]) -> None:
