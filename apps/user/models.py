@@ -10,7 +10,7 @@ class User(Base):
 
     __tablename__ = 'user'
 
-    user_id = Column(Integer, primary_key=True, nullable=False)
+    id = Column(Integer, primary_key=True, nullable=False)
     username = Column(String(50), nullable=False, unique=True)
     password = Column(String(50), nullable=False)
     email = Column(String(100), nullable=False, unique=True)
@@ -26,7 +26,7 @@ class User(Base):
             (
                 '{name}(user_id={id}, username={username}, email={email}, '.format(
                     name=self.__class__.__name__,
-                    id=self.user_id,
+                    id=self.id,
                     username=self.username,
                     email=self.email,
                 ),
