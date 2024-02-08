@@ -6,14 +6,14 @@ from typing_extensions import Optional, Type, Union
 from apps.common.common_types import ModelType, SchemaType
 
 
-class AsyncBaseCRUDStatements(object):
+class BaseCRUDStatements(object):
     """Base model CRUD statements."""
 
     def __init__(self, *, model: Type[ModelType]) -> None:
         """Initialize class instance."""
         self.model = model
 
-    async def create(
+    def create(
         self,
         *,
         schema: Optional[SchemaType] = None,
@@ -31,7 +31,7 @@ class AsyncBaseCRUDStatements(object):
             .execution_options(populate_existing=True)
         )
 
-    async def create_many(
+    def create_many(
         self,
         schemas: list[SchemaType],
     ) -> str:
@@ -49,7 +49,7 @@ class AsyncBaseCRUDStatements(object):
             .execution_options(populate_existing=True)
         )
 
-    async def read_statement(
+    def read_statement(
         self,
         *,
         schema: Optional[SchemaType] = None,
@@ -63,7 +63,7 @@ class AsyncBaseCRUDStatements(object):
             statement = statement.where(getattr(self.model, key) == value_data)
         return statement
 
-    async def update_statement(
+    def update_statement(
         self,
         *,
         schema: Union[SchemaType, dict, None] = None,
@@ -93,7 +93,7 @@ class AsyncBaseCRUDStatements(object):
             .execution_options(populate_existing=True)
         )
 
-    async def delete_statement(
+    def delete_statement(
         self,
         *,
         schema: Optional[SchemaType] = None,
@@ -107,7 +107,7 @@ class AsyncBaseCRUDStatements(object):
             statement = statement.where(getattr(self.model, key) == value_data)
         return statement
 
-    async def list_statement(
+    def list_statement(
         self,
         *,
         filters: Optional[dict] = None,
