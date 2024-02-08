@@ -1,11 +1,9 @@
 """Project SQLAlchemy orm services."""
 from sqlalchemy.engine import ChunkedIteratorResult
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing_extensions import Sequence, TypeVar
+from typing_extensions import Sequence
 
-from apps.common.db import Base
-
-ModelType = TypeVar('ModelType', bound=Base)
+from apps.common.common_types import ModelType
 
 
 class StatementExecutor(object):
