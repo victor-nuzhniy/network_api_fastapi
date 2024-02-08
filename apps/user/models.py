@@ -1,5 +1,6 @@
 """Models for user apps."""
 from sqlalchemy import Boolean, Column, Integer, String, func
+from sqlalchemy.orm import relationship
 
 from apps.common.common_utilities import AwareDateTime
 from apps.common.db import Base
@@ -16,15 +17,18 @@ class User(Base):
     email = Column(String(100), nullable=False, unique=True)
     is_active = Column(Boolean, default=False)
     is_admin = Column(Boolean, default=False)
-    created_at = Column(AwareDateTime, default=func.now(), nullable=False)
+    created_at = Column(AwareDateTime, default=func.now())
     updated_at = Column(AwareDateTime, default=func.now(), onupdate=func.now())
     last_visit_at = Column(AwareDateTime, default=func.now())
+    last_request_at = Column(AwareDateTime, default=func.now())
+    posts = relationship('Post', back_populates='user')
+    likes = relationship('Like', back_populates='user')
 
     def __repr__(self) -> str:
         """Represent class instance."""
         return ''.join(
             (
-                '{name}(user_id={id}, username={username}, email={email}, '.format(
+                '{name}(id={id}, username={username}, email={email}, '.format(
                     name=self.__class__.__name__,
                     id=self.id,
                     username=self.username,
