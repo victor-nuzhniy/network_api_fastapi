@@ -13,7 +13,7 @@ class BaseCRUDStatements(object):
         """Initialize class instance."""
         self.model = model
 
-    def create(
+    def create_statement(
         self,
         *,
         schema: Optional[SchemaType] = None,
@@ -31,7 +31,7 @@ class BaseCRUDStatements(object):
             .execution_options(populate_existing=True)
         )
 
-    def create_many(
+    def create_many_statement(
         self,
         schemas: list[SchemaType],
     ) -> str:
