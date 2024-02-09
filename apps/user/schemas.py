@@ -28,7 +28,7 @@ class CreateUserIn(BaseInSchema):
 class CreateUserOut(BaseOutSchema):
     """User creation out schema."""
 
-    user_id: int
+    id: int
     username: str
     last_visit_at: datetime
     email: str
