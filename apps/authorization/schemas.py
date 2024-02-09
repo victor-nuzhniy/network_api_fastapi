@@ -28,3 +28,11 @@ class UserIn(TokenPayload):
     """User in schema."""
 
     id: int
+
+
+class AuthOut(BaseOutSchema):
+    """Authorization out schema."""
+
+    access_token: str
+    refresh_token: str
+    id: int
