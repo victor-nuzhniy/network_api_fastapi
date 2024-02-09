@@ -12,7 +12,7 @@ authorization_router = APIRouter()
 
 
 @authorization_router.post(
-    '/login',
+    '/login/',
     name='login',
     response_model=AuthOut,
     summary='Create access and refresh token',

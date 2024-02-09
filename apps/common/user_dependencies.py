@@ -13,7 +13,7 @@ from apps.common.exceptions import BackendError
 from apps.common.orm_services import statement_executor
 from apps.user.statements import user_crud_statements
 
-reusable_oauth = OAuth2PasswordBearer(tokenUrl='/login', scheme_name='JWT')
+reusable_oauth = OAuth2PasswordBearer(tokenUrl='/login/', scheme_name='JWT')
 
 
 async def get_current_user(
