@@ -13,7 +13,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, nullable=False)
     username = Column(String(50), nullable=False, unique=True)
-    password = Column(String(50), nullable=False)
+    password = Column(String(120), nullable=False)
     email = Column(String(100), nullable=False, unique=True)
     is_active = Column(Boolean, default=False)
     is_admin = Column(Boolean, default=False)
