@@ -13,8 +13,13 @@ class Post(Base):
 
     id = Column(Integer, primary_key=True, nullable=False)
     message = Column(String(255), nullable=False)
-    created_at = Column(AwareDateTime, default=func.now())
-    updated_at = Column(AwareDateTime, default=func.now(), onupdate=func.now())
+    created_at = Column(AwareDateTime, default=func.now(), nullable=False)
+    updated_at = Column(
+        AwareDateTime,
+        default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
     user_id = Column(
         Integer,
         ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'),
@@ -46,8 +51,8 @@ class Like(Base):
     __tablename__ = 'like'
 
     id = Column(Integer, primary_key=True, nullable=False)
-    eval = Column(Boolean, default=False)
-    created_at = Column(AwareDateTime, default=func.now())
+    eval = Column(Boolean, default=False, nullable=False)
+    created_at = Column(AwareDateTime, default=func.now(), nullable=False)
     user_id = Column(
         Integer,
         ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'),

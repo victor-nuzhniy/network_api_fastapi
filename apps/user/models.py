@@ -15,12 +15,17 @@ class User(Base):
     username = Column(String(50), nullable=False, unique=True)
     password = Column(String(120), nullable=False)
     email = Column(String(100), nullable=False, unique=True)
-    is_active = Column(Boolean, default=False)
-    is_admin = Column(Boolean, default=False)
-    created_at = Column(AwareDateTime, default=func.now())
-    updated_at = Column(AwareDateTime, default=func.now(), onupdate=func.now())
-    last_visit_at = Column(AwareDateTime, default=func.now())
-    last_request_at = Column(AwareDateTime, default=func.now())
+    is_active = Column(Boolean, default=False, nullable=False)
+    is_admin = Column(Boolean, default=False, nullable=False)
+    created_at = Column(AwareDateTime, default=func.now(), nullable=False)
+    updated_at = Column(
+        AwareDateTime,
+        default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+    last_visit_at = Column(AwareDateTime, default=func.now(), nullable=False)
+    last_request_at = Column(AwareDateTime, default=func.now(), nullable=False)
     posts = relationship('Post', back_populates='user')
     likes = relationship('Like', back_populates='user')
 
