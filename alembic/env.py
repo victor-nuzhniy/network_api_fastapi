@@ -8,7 +8,9 @@ from sqlalchemy import engine_from_config, pool
 from sqlalchemy_utils import create_database, database_exists
 
 from alembic import context
-from apps.common.db import Base
+from apps.common.db import Base, engine
+from apps.posts.models import Base as PostsBase  # type: ignore
+from apps.user.models import Base as UserBase  # type: ignore
 from settings import Settings
 
 config = context.config
@@ -19,9 +21,7 @@ config.set_main_option('sqlalchemy.url', str(Settings.POSTGRES_DSN))
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-
 target_metadata = Base.metadata
-
 
 if not database_exists(Settings.POSTGRES_DSN):
     create_database(Settings.POSTGRES_DSN)
@@ -63,6 +63,9 @@ def run_migrations_online() -> None:
         prefix='sqlalchemy.',
         poolclass=pool.NullPool,
     )
+
+    if connectable is None:
+        connectable = engine
 
     with connectable.connect() as connection:
         context.configure(connection=connection, target_metadata=target_metadata)
