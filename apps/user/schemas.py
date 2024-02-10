@@ -1,7 +1,8 @@
 """User apps schemas."""
 from datetime import datetime
+from re import fullmatch
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from apps.common.constants import EMAIL_REGEX
 from apps.common.schemas import BaseInSchema, BaseOutSchema
@@ -11,9 +12,17 @@ class CreateUserIn(BaseInSchema):
     """User creation in schema."""
 
     username: str = Field(max_length=50)
-    email: str = Field(max_length=100, pattern=EMAIL_REGEX)
+    email: str = Field(max_length=100)
     password: str = Field(max_length=120)
-    password_re_check: str
+    password_re_check: str = Field(exclude=True)
+
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls, email_value: str) -> str:
+        """Validate email field."""
+        if not fullmatch(EMAIL_REGEX, email_value):
+            raise ValueError('Invalid email address format')
+        return email_value
 
     @model_validator(mode='after')
     def re_check_password(self) -> 'CreateUserIn':
