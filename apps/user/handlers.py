@@ -38,12 +38,7 @@ class UserHandlers(object):
             commit=True,
         )
         checked_user: User = checkers.check_created_instance(created_user, 'User')
-        return CreateUserOut(
-            id=checked_user.id,
-            username=checked_user.username,
-            email=checked_user.email,
-            is_active=checked_user.is_active,
-        )
+        return CreateUserOut.model_validate(checked_user)
 
 
 user_handlers = UserHandlers()

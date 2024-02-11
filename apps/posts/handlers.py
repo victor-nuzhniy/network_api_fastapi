@@ -34,13 +34,7 @@ class PostHandlers(object):
             commit=True,
         )
         checked_post: Post = checkers.check_created_instance(created_post, 'Post')
-        return CreatePostOut(
-            id=checked_post.id,
-            message=checked_post.message,
-            created_at=checked_post.created_at,
-            updated_at=checked_post.updated_at,
-            user_id=checked_post.user_id,
-        )
+        return CreatePostOut.model_validate(checked_post)
 
 
 post_handlers = PostHandlers()

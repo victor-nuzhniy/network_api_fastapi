@@ -34,13 +34,7 @@ class LikeHandlers(object):
             commit=True,
         )
         checked_like: Like = checkers.check_created_instance(created_like, 'Like')
-        return CreateLikeOut(
-            id=checked_like.id,
-            eval=checked_like.eval,
-            created_at=checked_like.created_at,
-            user_id=checked_like.user_id,
-            post_id=checked_like.post_id,
-        )
+        return CreateLikeOut.model_validate(checked_like)
 
 
 like_handlers = LikeHandlers()
