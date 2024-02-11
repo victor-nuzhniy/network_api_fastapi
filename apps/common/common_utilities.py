@@ -5,7 +5,7 @@ from fastapi import HTTPException, status
 from jose import jwt
 from pytz import utc
 from sqlalchemy import DATETIME, TypeDecorator
-from typing_extensions import Sequence, Type
+from typing_extensions import Any, Sequence, Type
 
 from apps.authorization.schemas import TokenPayload
 from apps.common.exceptions import BackendError
@@ -64,9 +64,9 @@ class Checkers(object):
 
     def check_created_instance(
         self,
-        instance: Sequence[None] | None,
+        instance: Any,
         name: str,
-    ) -> None:
+    ) -> Any:
         """Check whether inst is None and of Sequence type, return otherwise."""
         if instance is None:
             raise BackendError(message="{name} haven't been created".format(name=name))
@@ -75,6 +75,7 @@ class Checkers(object):
                 message='Improper executor call',
                 code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+        return instance
 
 
 checkers = Checkers()
