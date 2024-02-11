@@ -19,7 +19,7 @@ posts_router = APIRouter()
     response_model=JSENDOutSchema[CreatePostOut],
     summary='Create post',
     responses={
-        200: {'description': 'Successful create user response'},
+        200: {'description': 'Successful create post response'},
         422: {'model': JSENDFailOutSchema, 'description': 'ValidationError'},
     },
     tags=['Posts application'],
