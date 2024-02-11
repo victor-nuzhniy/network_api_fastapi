@@ -8,7 +8,6 @@ from sqlalchemy import DATETIME, TypeDecorator
 from typing_extensions import Sequence, Type
 
 from apps.authorization.schemas import TokenPayload
-from apps.common.common_types import ModelType
 from apps.common.exceptions import BackendError
 from settings import Settings
 
@@ -65,16 +64,17 @@ class Checkers(object):
 
     def check_created_instance(
         self,
-        instance: ModelType | Sequence[ModelType | None] | None,
+        instance: Sequence[None] | None,
         name: str,
-    ) -> ModelType:
+    ) -> None:
         """Check whether inst is None and of Sequence type, return otherwise."""
         if instance is None:
             raise BackendError(message="{name} haven't been created".format(name=name))
-        raise BackendError(
-            message='Improper executor call',
-            code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+        if isinstance(instance, Sequence):
+            raise BackendError(
+                message='Improper executor call',
+                code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 checkers = Checkers()
