@@ -10,7 +10,7 @@ metadata = [
         'description': "Available endpoints from 'posts' app",
     },
     {
-        'name': 'Liks application',
+        'name': 'Likes application',
         'description': "Available endpoints from 'likes' app",
     },
     {
