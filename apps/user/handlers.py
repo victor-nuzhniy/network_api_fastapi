@@ -39,7 +39,6 @@ class UserHandlers(object):
         return CreateUserOut(
             id=created_user.id,
             username=created_user.username,
-            last_visit_at=created_user.last_visit_at,
             email=created_user.email,
             is_active=created_user.is_active,
         )
