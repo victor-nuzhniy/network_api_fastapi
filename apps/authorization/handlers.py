@@ -27,7 +27,7 @@ class AuthorizationHandlers(object):
     ) -> AuthOut:
         """Login user with given credentials."""
         statement: str = user_crud_statements.read_statement(
-            obj_data={'login': form_data.username},
+            obj_data={'username': form_data.username},
         )
         user: Row = await statement_executor.execute_statement(session, statement)
         verify_user(user)
