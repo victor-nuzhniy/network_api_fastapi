@@ -17,7 +17,7 @@ likes_router = APIRouter()
     '/like/',
     name='create_like',
     response_model=JSENDOutSchema[CreateLikeOut],
-    summary='Create post',
+    summary='Create like',
     responses={
         200: {'description': 'Successful create like response'},
         422: {'model': JSENDFailOutSchema, 'description': 'ValidationError'},
