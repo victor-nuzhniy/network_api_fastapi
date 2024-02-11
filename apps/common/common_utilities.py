@@ -67,7 +67,7 @@ class Checkers(object):
         self,
         instance: ModelType | Sequence[ModelType | None] | None,
         name: str,
-    ) -> None:
+    ) -> ModelType:
         """Check whether instance is not None and not of Sequence type."""
         if instance is None:
             raise BackendError(message="{name} haven't been created".format(name=name))
@@ -76,6 +76,7 @@ class Checkers(object):
                 message='Improper executor call',
                 code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+        return instance
 
 
 checkers = Checkers()
