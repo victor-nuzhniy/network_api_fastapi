@@ -5,9 +5,9 @@ from typing_extensions import Sequence
 
 from apps.common.exceptions import BackendError
 from apps.common.orm_services import statement_executor as executor
+from apps.likes.models import Like
 from apps.likes.schemas import CreateLikeIn, CreateLikeOut
 from apps.likes.statements import like_crud_statements
-from apps.posts.models import Like
 from apps.user.models import User
 
 
