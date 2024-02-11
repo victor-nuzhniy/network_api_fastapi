@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from apps.authorization.routers import authorization_router
 from apps.common.exceptions import BackendError
 from apps.common.exceptions_handlers import backend_error_handler
+from apps.posts.routers import post_router
 from apps.user.routers import user_router
 from settings import Settings
 
@@ -23,3 +24,4 @@ app.add_exception_handler(BackendError, backend_error_handler)  # type: ignore
 
 app.include_router(user_router)
 app.include_router(authorization_router)
+app.include_router(post_router)
