@@ -29,16 +29,12 @@ async def create_user(
 ) -> dict:
     """**Create user record**.
 
-    **Path**:
-    - **university_id**: university id for creating user
-
     **Input**:
+    - **username**: user name, max 50 symbols, required
     - **email**: user email, only letters (a-z), numbers (0-9) and periods (.) are
     allowed, required
     - **password**: password, cannot be empty, required
     - **password_re_check**: password recheck, required
-    - **role_id**: user role id, required
-    - **faculty_id**: user faculty id, required
 
     **Return**:
     - **user_id**: int, id of created user
