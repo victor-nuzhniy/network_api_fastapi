@@ -29,7 +29,7 @@ class JSENDOutSchema(BaseModel, Generic[SchemaVar]):
     """Output JSEND schema with success status."""
 
     status: JSENDStatus = Field(default=JSENDStatus.SUCCESS)
-    data: SchemaVar  # noqa: WPS110
+    data: SchemaVar | list[SchemaVar]  # noqa: WPS110
     message: Annotated[str, Field(examples=['Some message'])]
     code: int = Field(default=http_status.HTTP_200_OK)
 
