@@ -9,6 +9,7 @@ from sqlalchemy_utils import create_database, database_exists
 
 from alembic import context
 from apps.common.db import Base, engine
+from apps.likes.models import Base as LikesBase  # type: ignore
 from apps.posts.models import Base as PostsBase  # type: ignore
 from apps.user.models import Base as UserBase  # type: ignore
 from settings import Settings
