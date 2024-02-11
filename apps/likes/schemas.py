@@ -8,17 +8,23 @@ from apps.common.schemas import BaseInSchema
 
 
 class CreateLikeIn(BaseInSchema):
-    """Like creation in schema."""
+    """Like creation in schema, for creation not admin user."""
 
-    eval: Annotated[bool, Field(title='Like evaluation', default=False)]
-    post_id: Annotated[int, Field(title='Post id to evaluate', default=1)]
+    eval: Annotated[bool, Field(examples=[False], description='Like evaluation')]
+    post_id: Annotated[int, Field(examples=[1], description='Post id to evaluate')]
 
 
 class CreateLikeOut(BaseInSchema):
-    """Like creation out schema."""
+    """Like creation out schema, created not admin user."""
 
-    id: Annotated[int, Field(title='Like id', examples=[1])]
-    eval: Annotated[bool, Field(title='Like evaluation', examples=[False])]
-    created_at: Annotated[datetime, Field(title='Like created at')]
-    user_id: Annotated[int, Field(title='Like created user with id')]
-    post_id: Annotated[int, Field(title='Like created to post with id')]
+    id: Annotated[int, Field(description='Like id', examples=[1])]
+    eval: Annotated[bool, Field(description='Like evaluation', examples=[False])]
+    created_at: Annotated[datetime, Field(description='Like created at')]
+    user_id: Annotated[
+        int,
+        Field(description='Like created user with id', examples=[1]),
+    ]
+    post_id: Annotated[
+        int,
+        Field(description='Like created to post with id', examples=[2]),
+    ]

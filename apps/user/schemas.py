@@ -1,8 +1,8 @@
 """User apps schemas."""
-from datetime import datetime
 from re import fullmatch
 
 from pydantic import Field, field_validator, model_validator
+from typing_extensions import Annotated
 
 from apps.common.constants import EMAIL_REGEX
 from apps.common.schemas import BaseInSchema, BaseOutSchema
@@ -11,10 +11,27 @@ from apps.common.schemas import BaseInSchema, BaseOutSchema
 class CreateUserIn(BaseInSchema):
     """User creation in schema."""
 
-    username: str = Field(max_length=50)
-    email: str = Field(max_length=100)
-    password: str = Field(max_length=120)
-    password_re_check: str = Field(exclude=True)
+    username: Annotated[
+        str,
+        Field(min_length=1, max_length=50, examples=['Alex'], description='User name'),
+    ]
+    email: Annotated[
+        str,
+        Field(max_length=100, examples=['a@a.com'], description='User email'),
+    ]
+    password: Annotated[
+        str,
+        Field(
+            min_length=1,
+            max_length=120,
+            examples=['111'],
+            description='User password',
+        ),
+    ]
+    password_re_check: Annotated[
+        str,
+        Field(exclude=True, examples=['111'], description='User password recheck'),
+    ]
 
     @field_validator('email')
     @classmethod
@@ -37,8 +54,10 @@ class CreateUserIn(BaseInSchema):
 class CreateUserOut(BaseOutSchema):
     """User creation out schema."""
 
-    id: int
-    username: str
-    last_visit_at: datetime
-    email: str
-    is_active: bool
+    id: Annotated[int, Field(description='Created user id', examples=[1])]
+    username: Annotated[str, Field(description='Created username', examples=['Alex'])]
+    email: Annotated[str, Field(description='Created user email', examples=['a@a.com'])]
+    is_active: Annotated[
+        bool,
+        Field(description='Created user "is_active" status', examples=[True]),
+    ]
