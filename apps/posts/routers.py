@@ -10,10 +10,10 @@ from apps.posts.handlers import post_handlers
 from apps.posts.schemas import CreatePostIn, CreatePostOut
 from apps.user.models import User
 
-post_router = APIRouter()
+posts_router = APIRouter()
 
 
-@post_router.post(
+@posts_router.post(
     '/post/',
     name='create_post',
     response_model=JSENDOutSchema[CreatePostOut],
@@ -22,7 +22,7 @@ post_router = APIRouter()
         200: {'description': 'Successful create user response'},
         422: {'model': JSENDFailOutSchema, 'description': 'ValidationError'},
     },
-    tags=['Users application'],
+    tags=['Posts application'],
 )
 async def create_post(
     request: Request,

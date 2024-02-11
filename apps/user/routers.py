@@ -8,10 +8,10 @@ from apps.common.schemas import JSENDFailOutSchema, JSENDOutSchema
 from apps.user.handlers import user_handlers
 from apps.user.schemas import CreateUserIn, CreateUserOut
 
-user_router = APIRouter()
+users_router = APIRouter()
 
 
-@user_router.post(
+@users_router.post(
     '/user/',
     name='create_user',
     response_model=JSENDOutSchema[CreateUserOut],

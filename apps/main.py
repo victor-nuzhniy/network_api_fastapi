@@ -5,11 +5,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from apps.authorization.routers import authorization_router
 from apps.common.exceptions import BackendError
 from apps.common.exceptions_handlers import backend_error_handler
-from apps.posts.routers import post_router
-from apps.user.routers import user_router
+from apps.posts.routers import posts_router
+from apps.user.routers import users_router
 from settings import Settings
+from tags_metadata import metadata
 
-app = FastAPI()
+app = FastAPI(openapi_tags=metadata)
 
 app.add_middleware(
     CORSMiddleware,
@@ -22,6 +23,6 @@ app.add_middleware(
 
 app.add_exception_handler(BackendError, backend_error_handler)  # type: ignore
 
-app.include_router(user_router)
+app.include_router(users_router)
 app.include_router(authorization_router)
-app.include_router(post_router)
+app.include_router(posts_router)
