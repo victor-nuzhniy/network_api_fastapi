@@ -1,11 +1,12 @@
 """User apps handlers."""
-from fastapi import Request
-from sqlalchemy.engine import Row
+from fastapi import Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing_extensions import Sequence
 
 from apps.authorization.auth_utilities import get_hashed_password
 from apps.common.exceptions import BackendError
 from apps.common.orm_services import statement_executor as executor
+from apps.user.models import User
 from apps.user.schemas import CreateUserIn, CreateUserOut
 from apps.user.statements import user_crud_statements
 
@@ -29,13 +30,20 @@ class UserHandlers(object):
                 'is_active': True,
             },
         )
-        created_user: Row = await executor.execute_statement(
+        created_user: User | Sequence[
+            User | None
+        ] | None = await executor.execute_statement(
             session,
             statement,
             commit=True,
         )
         if created_user is None:
             raise BackendError(message="User haven't been created.")
+        if isinstance(created_user, Sequence):
+            raise BackendError(
+                message='Improper executor call',
+                code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
         return CreateUserOut(
             id=created_user.id,
             username=created_user.username,
