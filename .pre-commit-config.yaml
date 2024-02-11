@@ -44,6 +44,7 @@ repos:
         - python-jose==3.3.0
         - pytz==2024.1
         - types-pytz
+        - bcrypt
         - mypy==1.8.0
       name: mypy
       entry: mypy
