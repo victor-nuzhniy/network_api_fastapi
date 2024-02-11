@@ -1,9 +1,9 @@
 """Posts apps handlers."""
-from fastapi import Request, status
+from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing_extensions import Sequence
 
-from apps.common.exceptions import BackendError
+from apps.common.common_utilities import checkers
 from apps.common.orm_services import statement_executor as executor
 from apps.posts.models import Post
 from apps.posts.schemas import CreatePostIn, CreatePostOut
@@ -33,19 +33,13 @@ class PostHandlers(object):
             statement,
             commit=True,
         )
-        if created_post is None:
-            raise BackendError(message="Post haven't been created.")
-        if isinstance(created_post, Sequence):
-            raise BackendError(
-                message='Improper executor call',
-                code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+        checked_post: Post = checkers.check_created_instance(created_post, 'Post')
         return CreatePostOut(
-            id=created_post.id,
-            message=created_post.message,
-            created_at=created_post.created_at,
-            updated_at=created_post.updated_at,
-            user_id=created_post.user_id,
+            id=checked_post.id,
+            message=checked_post.message,
+            created_at=checked_post.created_at,
+            updated_at=checked_post.updated_at,
+            user_id=checked_post.user_id,
         )
 
 
