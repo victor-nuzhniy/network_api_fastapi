@@ -2,7 +2,7 @@
 
 from fastapi import status as http_status
 from pydantic import BaseModel, ConfigDict, Field
-from typing_extensions import Annotated, Generic, Optional, TypeVar, Union
+from typing_extensions import Annotated, Generic, Optional, Sequence, TypeVar, Union
 
 from apps.common.enum import JSENDStatus
 
@@ -29,7 +29,7 @@ class JSENDOutSchema(BaseModel, Generic[SchemaVar]):
     """Output JSEND schema with success status."""
 
     status: JSENDStatus = Field(default=JSENDStatus.SUCCESS)
-    data: SchemaVar | list[SchemaVar]  # noqa: WPS110
+    data: SchemaVar | Sequence[SchemaVar | None] | None  # noqa: WPS110
     message: Annotated[str, Field(examples=['Some message'])]
     code: int = Field(default=http_status.HTTP_200_OK)
 
