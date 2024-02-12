@@ -150,7 +150,7 @@ class BaseRouterInitializer(object):
     def get_create_router(self) -> None:
         """Get create router."""
         if TYPE_CHECKING:
-            schema_type: TypeAlias = LocalSchema
+            schema_type: TypeAlias = SchemaType
         else:
             schema_type = self.in_schema
 
