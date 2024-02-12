@@ -29,7 +29,10 @@ class AuthorizationHandlers(object):
         statement: str = user_crud_statements.read_statement(
             obj_data={'username': form_data.username},
         )
-        user: Row = await statement_executor.execute_statement(session, statement)
+        user: Row = await statement_executor.execute_return_statement(
+            session,
+            statement,
+        )
         verify_user(user)
         verify_password(user, form_data.password)
         return AuthOut(

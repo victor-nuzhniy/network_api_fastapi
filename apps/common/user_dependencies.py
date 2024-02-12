@@ -35,7 +35,7 @@ async def get_user(
     )
     user: User | Sequence[
         User | None
-    ] | None = await statement_executor.execute_statement(
+    ] | None = await statement_executor.execute_return_statement(
         session,
         read_user_stmt,
     )

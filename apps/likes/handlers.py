@@ -28,7 +28,7 @@ class LikeHandlers(object):
         )
         created_like: Like | Sequence[
             Like | None
-        ] | None = await executor.execute_statement(
+        ] | None = await executor.execute_return_statement(
             session,
             statement,
             commit=True,
