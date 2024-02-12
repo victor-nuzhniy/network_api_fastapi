@@ -181,6 +181,94 @@ class BaseRouterInitializer(object):
                 ),
             }
 
+    def get_read_router(self) -> None:
+        """Get create router."""
+
+        @self.router.get(**self._kwargs_generator.get_read_router_kwargs())
+        async def create_instance(  # noqa: WPS430
+            request: Request,
+            instance_id: int,
+            user: Annotated[User, Depends(get_current_admin_user)],
+            session: Annotated[AsyncSession, Depends(get_async_session)],
+        ) -> dict:
+            """Create post router."""
+            statement = self.statements.read_statement(obj_data={'id': instance_id})
+            read_instance: LocalModelType | Sequence[
+                LocalModelType | None
+            ] | None = await executor.execute_statement(session, statement)
+            checked_instance = checkers.check_created_instance(
+                read_instance,
+                self.model.__name__,
+            )
+            output_instance: LocalOutSchema = self.out_schema.model_validate(
+                checked_instance,
+            )
+            return {
+                'data': output_instance,
+                'message': 'Read {name} with id {id}'.format(
+                    name=self.model.__name__.lower(),
+                    id=output_instance.id,
+                ),
+            }
+
+    def get_update_router(self) -> None:
+        """Get create router."""
+        if TYPE_CHECKING:
+            schema_type: TypeAlias = SchemaType
+        else:
+            schema_type = self.in_schema
+
+        @self.router.put(**self._kwargs_generator.get_update_router_kwargs())
+        async def update_instance(  # noqa: WPS430
+            request: Request,
+            instance_id: int,
+            schema: Annotated[schema_type, Depends()],
+            user: Annotated[User, Depends(get_current_admin_user)],
+            session: Annotated[AsyncSession, Depends(get_async_session)],
+        ) -> dict:
+            """Create post router."""
+            statement = self.statements.update_statement(
+                schema=schema,
+                where_data={'id': instance_id},
+            )
+            updated_instance: LocalModelType | Sequence[
+                LocalModelType | None
+            ] | None = await executor.execute_statement(session, statement, commit=True)
+            checked_instance = checkers.check_created_instance(
+                updated_instance,
+                self.model.__name__,
+            )
+            output_instance: LocalOutSchema = self.out_schema.model_validate(
+                checked_instance,
+            )
+            return {
+                'data': output_instance,
+                'message': 'Updated {name} with id {id}'.format(
+                    name=self.model.__name__.lower(),
+                    id=output_instance.id,
+                ),
+            }
+
+    def get_delete_router(self) -> None:
+        """Get create router."""
+
+        @self.router.delete(**self._kwargs_generator.get_delete_router_kwargs())
+        async def create_instance(  # noqa: WPS430
+            request: Request,
+            instance_id: int,
+            user: Annotated[User, Depends(get_current_admin_user)],
+            session: Annotated[AsyncSession, Depends(get_async_session)],
+        ) -> dict:
+            """Create post router."""
+            statement = self.statements.delete_statement(obj_data={'id': instance_id})
+            await executor.execute_statement(session, statement, commit=True)
+            return {
+                'message': 'Deleted {name} with id {id}'.format(
+                    name=self.model.__name__.lower(),
+                    id=instance_id,
+                ),
+            }
+
     def get_list_router(self) -> None:
         """Get list router."""
 
