@@ -16,6 +16,15 @@ class CreatePostIn(BaseInSchema):
     ]
 
 
+class AdminCreatePostIn(CreatePostIn):
+    """Admin post creation in schema."""
+
+    user_id: Annotated[
+        int,
+        Field(description='User id created post message', examples=[1]),
+    ]
+
+
 class CreatePostOut(BaseOutSchema):
     """Post creation out schema."""
 
