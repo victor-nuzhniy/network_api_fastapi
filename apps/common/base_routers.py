@@ -1,10 +1,10 @@
 """Base routers for admin interface."""
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing_extensions import TYPE_CHECKING, Annotated, Sequence, TypeAlias
+from typing_extensions import TYPE_CHECKING, Annotated, Any, Sequence, TypeAlias
 
 from apps.common.base_statements import BaseCRUDStatements
-from apps.common.common_types import LocalSchema, ModelType, SchemaType
+from apps.common.common_types import ModelType, SchemaType
 from apps.common.common_utilities import checkers
 from apps.common.dependencies import get_async_session
 from apps.common.orm_services import statement_executor as executor
@@ -14,7 +14,6 @@ from apps.user.models import User
 
 if TYPE_CHECKING:
     LocalModelType: TypeAlias = ModelType
-    LocalOutSchema: TypeAlias = LocalSchema
 else:
     LocalOutSchema: TypeAlias = SchemaType
 
@@ -25,7 +24,7 @@ class BaseRouterKwargs(object):
     def __init__(
         self,
         name: str,
-        out_schema: LocalOutSchema,
+        out_schema: SchemaType,
     ) -> None:
         """Initialize BaseRouter instance."""
         self.name = name
@@ -97,7 +96,7 @@ class BaseRouterKwargs(object):
         return {
             'path': self.instance_path,
             'name': 'delete_{name}'.format(name=self.name),
-            'response_model': self.response_model,
+            'response_model': JSENDOutSchema,
             'summary': 'Delete {name} by admin'.format(name=self.name),
             'responses': {
                 200: {
@@ -113,13 +112,13 @@ class BaseRouterKwargs(object):
     def get_list_router_kwargs(self) -> dict:
         """Get list router kwargs."""
         return {
-            'path': '/admin/{name}/list/'.format(name=self.name),
+            'path': '/admin/list/{name}/'.format(name=self.name),
             'name': 'read_{name}_list'.format(name=self.name),
             'response_model': self.response_model_many,
             'summary': 'Get {name} list by admin'.format(name=self.name),
             'responses': {
                 200: {
-                    'description': 'Successful delete {name} response'.format(
+                    'description': 'Successful {name} list response'.format(
                         name=self.name,
                     ),
                 },
@@ -136,7 +135,7 @@ class BaseRouterInitializer(object):
         self,
         router: APIRouter,
         in_schema: SchemaType,
-        out_schema: LocalOutSchema,
+        out_schema: SchemaType,
         model: ModelType,
     ) -> None:
         """Initialize BaseRouterDecorators instance."""
@@ -165,12 +164,16 @@ class BaseRouterInitializer(object):
             statement = self.statements.create_statement(schema=schema)
             created_instance: LocalModelType | Sequence[
                 LocalModelType | None
-            ] | None = await executor.execute_statement(session, statement, commit=True)
+            ] | None = await executor.execute_return_statement(
+                session,
+                statement,
+                commit=True,
+            )
             checked_instance = checkers.check_created_instance(
                 created_instance,
                 self.model.__name__,
             )
-            output_instance: LocalOutSchema = self.out_schema.model_validate(
+            output_instance: schema_type = self.out_schema.model_validate(
                 checked_instance,
             )
             return {
@@ -183,6 +186,10 @@ class BaseRouterInitializer(object):
 
     def get_read_router(self) -> None:
         """Get create router."""
+        if TYPE_CHECKING:
+            schema_type: TypeAlias = SchemaType
+        else:
+            schema_type = self.in_schema
 
         @self.router.get(**self._kwargs_generator.get_read_router_kwargs())
         async def create_instance(  # noqa: WPS430
@@ -195,12 +202,12 @@ class BaseRouterInitializer(object):
             statement = self.statements.read_statement(obj_data={'id': instance_id})
             read_instance: LocalModelType | Sequence[
                 LocalModelType | None
-            ] | None = await executor.execute_statement(session, statement)
+            ] | None = await executor.execute_return_statement(session, statement)
             checked_instance = checkers.check_created_instance(
                 read_instance,
                 self.model.__name__,
             )
-            output_instance: LocalOutSchema = self.out_schema.model_validate(
+            output_instance: schema_type = self.out_schema.model_validate(
                 checked_instance,
             )
             return {
@@ -233,12 +240,16 @@ class BaseRouterInitializer(object):
             )
             updated_instance: LocalModelType | Sequence[
                 LocalModelType | None
-            ] | None = await executor.execute_statement(session, statement, commit=True)
+            ] | None = await executor.execute_return_statement(
+                session,
+                statement,
+                commit=True,
+            )
             checked_instance = checkers.check_created_instance(
                 updated_instance,
                 self.model.__name__,
             )
-            output_instance: LocalOutSchema = self.out_schema.model_validate(
+            output_instance: schema_type = self.out_schema.model_validate(
                 checked_instance,
             )
             return {
@@ -261,8 +272,9 @@ class BaseRouterInitializer(object):
         ) -> dict:
             """Create post router."""
             statement = self.statements.delete_statement(obj_data={'id': instance_id})
-            await executor.execute_statement(session, statement, commit=True)
+            await executor.execute_delete_statement(session, statement)
             return {
+                'data': None,
                 'message': 'Deleted {name} with id {id}'.format(
                     name=self.model.__name__.lower(),
                     id=instance_id,
@@ -280,10 +292,22 @@ class BaseRouterInitializer(object):
         ) -> dict:
             """Get instance list."""
             statement: str = self.statements.list_statement()
-            instance_list: Sequence[
-                LocalModelType | None
-            ] | None = await executor.execute_statement(session, statement, many=True)
+            instance_list: Sequence[Any | None] | Sequence[
+                Sequence[Any | None]
+            ] | None = await executor.execute_return_statement(
+                session,
+                statement,
+                many=True,
+            )
             return {
                 'data': instance_list,
                 'message': 'Got {name} instances list'.format(name=self.model.__name__),
             }
+
+    def initialize_routers(self) -> None:
+        """Initialize all routers."""
+        self.get_create_router()
+        self.get_read_router()
+        self.get_update_router()
+        self.get_delete_router()
+        self.get_list_router()
