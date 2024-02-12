@@ -14,6 +14,15 @@ class CreateLikeIn(BaseInSchema):
     post_id: Annotated[int, Field(examples=[1], description='Post id to evaluate')]
 
 
+class AdminCreateLikeIn(CreateLikeIn):
+    """Like creation in schema for admin user."""
+
+    user_id: Annotated[
+        int,
+        Field(examples=[1], description='Like created by user with id'),
+    ]
+
+
 class CreateLikeOut(BaseInSchema):
     """Like creation out schema, created not admin user."""
 
