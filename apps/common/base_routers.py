@@ -141,12 +141,11 @@ class BaseRouterInitializer(object):
     ) -> None:
         """Initialize BaseRouterDecorators instance."""
         self.router = router
-        self.name = model.__name__.lower()
         self.in_schema = in_schema
         self.out_schema = out_schema
         self.statements = BaseCRUDStatements(model=model)
         self.model = model
-        self._kwargs_generator = BaseRouterKwargs(self.name, out_schema)
+        self._kwargs_generator = BaseRouterKwargs(model.__name__.lower(), out_schema)
 
     def get_create_router(self) -> None:
         """Get create router."""
@@ -177,7 +176,7 @@ class BaseRouterInitializer(object):
             return {
                 'data': output_instance,
                 'message': 'Created {name} with id {id}'.format(
-                    name=self.name,
+                    name=self.model.__name__.lower(),
                     id=output_instance.id,
                 ),
             }
