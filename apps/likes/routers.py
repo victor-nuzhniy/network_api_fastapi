@@ -3,14 +3,26 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing_extensions import Annotated
 
+from apps.common.base_routers import BaseRouterInitializer
 from apps.common.dependencies import get_async_session
 from apps.common.schemas import JSENDFailOutSchema, JSENDOutSchema
 from apps.common.user_dependencies import get_current_user
 from apps.likes.handlers import like_handlers
-from apps.likes.schemas import CreateLikeIn, CreateLikeOut
+from apps.likes.models import Like
+from apps.likes.schemas import AdminCreateLikeIn, CreateLikeIn, CreateLikeOut
 from apps.user.models import User
 
 likes_router = APIRouter()
+
+
+admin_like_router_initializer = BaseRouterInitializer(  # type: ignore
+    router=likes_router,
+    in_schema=AdminCreateLikeIn,
+    out_schema=CreateLikeOut,
+    model=Like,
+)
+
+admin_like_router_initializer.initialize_routers()
 
 
 @likes_router.post(
