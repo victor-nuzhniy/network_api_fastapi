@@ -1,9 +1,10 @@
 """User apps schemas."""
 from re import fullmatch
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, computed_field, field_validator, model_validator
 from typing_extensions import Annotated
 
+from apps.authorization.auth_utilities import get_hashed_password
 from apps.common.constants import EMAIL_REGEX
 from apps.common.schemas import BaseInSchema, BaseOutSchema
 
@@ -19,9 +20,11 @@ class CreateUserIn(BaseInSchema):
         str,
         Field(max_length=100, examples=['a@a.com'], description='User email'),
     ]
-    password: Annotated[
+    password_check: Annotated[
         str,
         Field(
+            exclude=True,
+            validation_alias='password',
             min_length=1,
             max_length=120,
             examples=['111'],
@@ -32,6 +35,11 @@ class CreateUserIn(BaseInSchema):
         str,
         Field(exclude=True, examples=['111'], description='User password recheck'),
     ]
+
+    @computed_field
+    def password(self) -> str:
+        """Hash password."""
+        return get_hashed_password(self.password_check)
 
     @field_validator('email')
     @classmethod
@@ -44,7 +52,7 @@ class CreateUserIn(BaseInSchema):
     @model_validator(mode='after')
     def re_check_password(self) -> 'CreateUserIn':
         """Check whether password_re_check is equal to password."""
-        password = self.password
+        password = self.password_check
         r_password = self.password_re_check
         if password is not None and r_password is not None and password != r_password:
             raise ValueError("Password don't match!")

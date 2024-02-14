@@ -3,7 +3,6 @@ from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing_extensions import Sequence
 
-from apps.authorization.auth_utilities import get_hashed_password
 from apps.common.common_utilities import checkers
 from apps.common.orm_services import statement_executor as executor
 from apps.user.models import User
@@ -21,12 +20,11 @@ class UserHandlers(object):
         session: AsyncSession,
     ) -> CreateUserOut:
         """Create user with given data."""
-        hashed_password = get_hashed_password(user.password)
         statement: str = user_crud_statements.create_statement(
             obj_data={
                 'username': user.username,
                 'email': user.email,
-                'password': hashed_password,
+                'password': user.password,
                 'is_active': True,
             },
         )
