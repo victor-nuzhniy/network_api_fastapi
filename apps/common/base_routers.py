@@ -8,7 +8,7 @@ from apps.common.common_types import ModelType, SchemaType
 from apps.common.common_utilities import checkers
 from apps.common.dependencies import get_async_session
 from apps.common.orm_services import statement_executor as executor
-from apps.common.schemas import JSENDFailOutSchema, JSENDOutSchema
+from apps.common.schemas import JSENDErrorOutSchema, JSENDFailOutSchema, JSENDOutSchema
 from apps.common.user_dependencies import get_current_admin_user
 from apps.user.models import User
 
@@ -16,6 +16,22 @@ if TYPE_CHECKING:
     LocalModelType: TypeAlias = ModelType
 else:
     LocalOutSchema: TypeAlias = SchemaType
+
+
+base_responses = {
+    401: {
+        'description': 'Not authenticated.',
+        'model': JSENDFailOutSchema,
+    },
+    403: {
+        'description': 'User is not an admin user.',
+        'model': JSENDFailOutSchema,
+    },
+    500: {'description': 'Internal server error.', 'model': JSENDErrorOutSchema},
+}
+validation_response = {
+    422: {'model': JSENDFailOutSchema, 'description': 'ValidationError'},
+}
 
 
 class BaseRouterKwargs(object):
@@ -41,89 +57,98 @@ class BaseRouterKwargs(object):
 
     def get_post_router_kwargs(self) -> dict:
         """Get post router kwargs."""
+        responses: dict = {
+            200: {
+                'description': 'Successful create {name} response'.format(
+                    name=self.name,
+                ),
+            },
+        }
+        responses.update(base_responses)
+        responses.update(validation_response)
         return {
             'path': '/admin/{name}/'.format(name=self.name),
             'name': 'create_{name}_admin'.format(name=self.name),
             'response_model': self.response_model,
             'summary': 'Create {name} by admin'.format(name=self.name),
-            'responses': {
-                200: {
-                    'description': 'Successful create {name} response'.format(
-                        name=self.name,
-                    ),
-                },
-                422: {'model': JSENDFailOutSchema, 'description': 'ValidationError'},
-            },
+            'responses': responses,
             'tags': self.tags,
         }
 
     def get_update_router_kwargs(self) -> dict:
         """Get update router kwargs."""
+        responses: dict = {
+            200: {
+                'description': 'Successful update {name} response'.format(
+                    name=self.name,
+                ),
+            },
+        }
+        responses.update(base_responses)
         return {
             'path': self.instance_path,
             'name': 'update_{name}'.format(name=self.name),
             'response_model': self.response_model,
             'summary': 'Update {name} by admin'.format(name=self.name),
-            'responses': {
-                200: {
-                    'description': 'Successful update {name} response'.format(
-                        name=self.name,
-                    ),
-                },
-            },
+            'responses': responses,
             'tags': self.tags,
         }
 
     def get_read_router_kwargs(self) -> dict:
         """Get read router kwargs."""
+        responses: dict = {
+            200: {
+                'description': 'Successful get {name} response'.format(
+                    name=self.name,
+                ),
+            },
+        }
+        responses.update(base_responses)
         return {
             'path': self.instance_path,
             'name': 'read_{name}'.format(name=self.name),
             'response_model': self.response_model,
             'summary': 'Get {name} with id by admin'.format(name=self.name),
-            'responses': {
-                200: {
-                    'description': 'Successful get {name} response'.format(
-                        name=self.name,
-                    ),
-                },
-            },
+            'responses': responses,
             'tags': self.tags,
         }
 
     def get_delete_router_kwargs(self) -> dict:
         """Get delete router kwargs."""
+        responses: dict = {
+            200: {
+                'description': 'Successful delete {name} response'.format(
+                    name=self.name,
+                ),
+            },
+        }
+        responses.update(base_responses)
+        responses.update(validation_response)
         return {
             'path': self.instance_path,
             'name': 'delete_{name}'.format(name=self.name),
             'response_model': JSENDOutSchema,
             'summary': 'Delete {name} by admin'.format(name=self.name),
-            'responses': {
-                200: {
-                    'description': 'Successful delete {name} response'.format(
-                        name=self.name,
-                    ),
-                },
-                422: {'model': JSENDFailOutSchema, 'description': 'ValidationError'},
-            },
+            'responses': responses,
             'tags': self.tags,
         }
 
     def get_list_router_kwargs(self) -> dict:
         """Get list router kwargs."""
+        responses: dict = {
+            200: {
+                'description': 'Successful {name} list response'.format(
+                    name=self.name,
+                ),
+            },
+        }
+        responses.update(base_responses)
         return {
             'path': '/admin/list/{name}/'.format(name=self.name),
             'name': 'read_{name}_list'.format(name=self.name),
             'response_model': self.response_model_many,
             'summary': 'Get {name} list by admin'.format(name=self.name),
-            'responses': {
-                200: {
-                    'description': 'Successful {name} list response'.format(
-                        name=self.name,
-                    ),
-                },
-                422: {'model': JSENDFailOutSchema, 'description': 'ValidationError'},
-            },
+            'responses': responses,
             'tags': self.tags,
         }
 
