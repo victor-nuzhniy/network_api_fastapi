@@ -38,7 +38,7 @@ admin_post_router_initializer.initialize_routers()
 )
 async def create_post(
     request: Request,
-    post: CreatePostIn,
+    post: Annotated[CreatePostIn, Depends()],
     user: Annotated[User, Depends(get_current_user)],
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ) -> dict:

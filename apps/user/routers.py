@@ -53,7 +53,7 @@ create_admin_user_router_initializer.get_create_router()
 )
 async def create_user(
     request: Request,
-    user: CreateUserIn,
+    user: Annotated[CreateUserIn, Depends()],
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ) -> dict:
     """**Create user record**.

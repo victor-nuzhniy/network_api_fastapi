@@ -38,7 +38,7 @@ admin_like_router_initializer.initialize_routers()
 )
 async def create_like(
     request: Request,
-    like: CreateLikeIn,
+    like: Annotated[CreateLikeIn, Depends()],
     user: Annotated[User, Depends(get_current_user)],
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ) -> dict:
