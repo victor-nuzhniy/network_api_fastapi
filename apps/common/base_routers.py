@@ -94,6 +94,25 @@ class BaseRouterKwargs(object):
             'tags': self.tags,
         }
 
+    def get_partially_update_router_kwargs(self) -> dict:
+        """Get update router kwargs."""
+        responses: dict = {
+            200: {
+                'description': 'Successful partially update {name} response'.format(
+                    name=self.name,
+                ),
+            },
+        }
+        responses.update(base_responses)
+        return {
+            'path': self.instance_path,
+            'name': 'partially update_{name}'.format(name=self.name),
+            'response_model': self.response_model,
+            'summary': 'Partially update {name} by admin'.format(name=self.name),
+            'responses': responses,
+            'tags': self.tags,
+        }
+
     def get_read_router_kwargs(self) -> dict:
         """Get read router kwargs."""
         responses: dict = {
@@ -153,30 +172,36 @@ class BaseRouterKwargs(object):
         }
 
 
-class BaseRouterInitializer(object):
-    """Base router initializer for admin interface."""
+class BaseInitializer(object):
+    """Base initializer class for BaseRouterInitializer."""
 
     def __init__(
         self,
         router: APIRouter,
-        in_schema: SchemaType,
+        in_schemas: tuple[SchemaType, ...],
         out_schema: SchemaType,
         model: ModelType,
     ) -> None:
         """Initialize BaseRouterDecorators instance."""
         self.router = router
-        self.in_schema = in_schema
+        self._in_create_schema = in_schemas[0]
+        self._in_update_schema = in_schemas[1]
+        self._in_part_update_schema = in_schemas[2]
         self.out_schema = out_schema
         self.statements = BaseCRUDStatements(model=model)
         self.model = model
         self._kwargs_generator = BaseRouterKwargs(model.__name__.lower(), out_schema)
+
+
+class BaseRouterInitializer(BaseInitializer):
+    """Base router initializer for admin interface."""
 
     def get_create_router(self) -> None:
         """Get create router."""
         if TYPE_CHECKING:
             schema_type: TypeAlias = SchemaType
         else:
-            schema_type = self.in_schema
+            schema_type = self._in_create_schema
 
         @self.router.post(**self._kwargs_generator.get_post_router_kwargs())
         async def create_instance(  # noqa: WPS430
@@ -214,7 +239,7 @@ class BaseRouterInitializer(object):
         if TYPE_CHECKING:
             schema_type: TypeAlias = SchemaType
         else:
-            schema_type = self.in_schema
+            schema_type = self._in_create_schema
 
         @self.router.get(**self._kwargs_generator.get_read_router_kwargs())
         async def create_instance(  # noqa: WPS430
@@ -248,10 +273,54 @@ class BaseRouterInitializer(object):
         if TYPE_CHECKING:
             schema_type: TypeAlias = SchemaType
         else:
-            schema_type = self.in_schema
+            schema_type = self._in_update_schema
 
         @self.router.put(**self._kwargs_generator.get_update_router_kwargs())
         async def update_instance(  # noqa: WPS430
+            request: Request,
+            instance_id: int,
+            schema: Annotated[schema_type, Depends()],
+            user: Annotated[User, Depends(get_current_admin_user)],
+            session: Annotated[AsyncSession, Depends(get_async_session)],
+        ) -> dict:
+            """Create post router."""
+            statement = self.statements.update_statement(
+                schema=schema,
+                where_data={'id': instance_id},
+            )
+            updated_instance: LocalModelType | Sequence[
+                LocalModelType | None
+            ] | None = await executor.execute_return_statement(
+                session,
+                statement,
+                commit=True,
+            )
+            checked_instance = checkers.check_created_instance(
+                updated_instance,
+                self.model.__name__,
+            )
+            output_instance: schema_type = self.out_schema.model_validate(
+                checked_instance,
+            )
+            return {
+                'data': output_instance,
+                'message': 'Updated {name} with id {id}'.format(
+                    name=self.model.__name__.lower(),
+                    id=output_instance.id,
+                ),
+            }
+
+    def get_partially_update_router(self) -> None:
+        """Get create router."""
+        if TYPE_CHECKING:
+            schema_type: TypeAlias = SchemaType
+        else:
+            schema_type = self._in_part_update_schema
+
+        @self.router.patch(
+            **self._kwargs_generator.get_partially_update_router_kwargs(),
+        )
+        async def partially_update_instance(  # noqa: WPS430
             request: Request,
             instance_id: int,
             schema: Annotated[schema_type, Depends()],
@@ -289,7 +358,7 @@ class BaseRouterInitializer(object):
         """Get create router."""
 
         @self.router.delete(**self._kwargs_generator.get_delete_router_kwargs())
-        async def create_instance(  # noqa: WPS430
+        async def delete_instance(  # noqa: WPS430
             request: Request,
             instance_id: int,
             user: Annotated[User, Depends(get_current_admin_user)],
@@ -334,5 +403,6 @@ class BaseRouterInitializer(object):
         self.get_create_router()
         self.get_read_router()
         self.get_update_router()
+        self.get_partially_update_router()
         self.get_delete_router()
         self.get_list_router()
