@@ -1,10 +1,12 @@
 """User apps schemas."""
+from datetime import datetime
 from re import fullmatch
 
 from pydantic import Field, computed_field, field_validator, model_validator
 from typing_extensions import Annotated
 
 from apps.authorization.auth_utilities import get_hashed_password
+from apps.authorization.schemas import UserOut
 from apps.common.constants import EMAIL_REGEX
 from apps.common.schemas import BaseInSchema, BaseOutSchema
 
@@ -69,3 +71,37 @@ class CreateUserOut(BaseOutSchema):
         bool,
         Field(description='Created user "is_active" status', examples=[True]),
     ]
+
+
+class AdminUserIn(BaseInSchema):
+    """User update in schema for admin interface."""
+
+    username: Annotated[str, Field(description='Update username', examples=['Alex'])]
+    email: Annotated[str, Field(description='Update user email', examples=['a@a.com'])]
+    is_active: Annotated[
+        bool,
+        Field(description='Update user "is_active" status', examples=[True]),
+    ]
+    is_admin: Annotated[
+        bool,
+        Field(description='Update user "is_admin" status', examples=[True]),
+    ]
+
+
+class CreateAdminUserIn(CreateUserIn):
+    """User create in schema for admin interface."""
+
+    is_active: Annotated[
+        bool,
+        Field(description='Created user "is_active" status', examples=[True]),
+    ]
+    is_admin: Annotated[
+        bool,
+        Field(description='Update user "is_admin" status', examples=[True]),
+    ]
+
+
+class AdminUserOut(UserOut):
+    """User out schema for admin interface."""
+
+    last_request_at: Annotated[datetime, Field(description='User last request at')]
