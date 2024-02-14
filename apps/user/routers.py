@@ -3,12 +3,41 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing_extensions import Annotated
 
+from apps.common.base_routers import BaseRouterInitializer
 from apps.common.dependencies import get_async_session
 from apps.common.schemas import JSENDFailOutSchema, JSENDOutSchema
 from apps.user.handlers import user_handlers
-from apps.user.schemas import CreateUserIn, CreateUserOut
+from apps.user.models import User
+from apps.user.schemas import (
+    AdminUserIn,
+    AdminUserOut,
+    CreateAdminUserIn,
+    CreateUserIn,
+    CreateUserOut,
+)
 
 users_router = APIRouter()
+
+admin_user_router_initializer = BaseRouterInitializer(  # type: ignore
+    router=users_router,
+    in_schema=AdminUserIn,
+    out_schema=AdminUserOut,
+    model=User,
+)
+
+admin_user_router_initializer.get_read_router()
+admin_user_router_initializer.get_update_router()
+admin_user_router_initializer.get_list_router()
+admin_user_router_initializer.get_delete_router()
+
+create_admin_user_router_initializer = BaseRouterInitializer(  # type: ignore
+    router=users_router,
+    in_schema=CreateAdminUserIn,
+    out_schema=AdminUserOut,
+    model=User,
+)
+
+create_admin_user_router_initializer.get_create_router()
 
 
 @users_router.post(
