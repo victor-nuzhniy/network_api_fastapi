@@ -25,6 +25,13 @@ class AdminCreatePostIn(CreatePostIn):
     ]
 
 
+class AdminPartiallyUpdatePostIn(BaseInSchema):
+    """Admin partially update in schema."""
+
+    message: str | None = None
+    user_id: int | None = None
+
+
 class CreatePostOut(BaseOutSchema):
     """Post creation out schema."""
 

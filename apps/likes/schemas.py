@@ -23,6 +23,14 @@ class AdminCreateLikeIn(CreateLikeIn):
     ]
 
 
+class AdminPartiallyUpdateLikeIn(BaseInSchema):
+    """Admin partially update in schema."""
+
+    eval: bool | None = None
+    post_id: int | None = None
+    user_id: int | None = None
+
+
 class CreateLikeOut(BaseInSchema):
     """Like creation out schema, created not admin user."""
 
