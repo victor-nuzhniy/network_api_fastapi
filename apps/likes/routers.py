@@ -9,7 +9,12 @@ from apps.common.schemas import JSENDFailOutSchema, JSENDOutSchema
 from apps.common.user_dependencies import get_current_user
 from apps.likes.handlers import like_handlers
 from apps.likes.models import Like
-from apps.likes.schemas import AdminCreateLikeIn, CreateLikeIn, CreateLikeOut
+from apps.likes.schemas import (
+    AdminCreateLikeIn,
+    AdminPartiallyUpdateLikeIn,
+    CreateLikeIn,
+    CreateLikeOut,
+)
 from apps.user.models import User
 
 likes_router = APIRouter()
@@ -17,7 +22,11 @@ likes_router = APIRouter()
 
 admin_like_router_initializer = BaseRouterInitializer(  # type: ignore
     router=likes_router,
-    in_schema=AdminCreateLikeIn,
+    in_schemas=(
+        AdminCreateLikeIn,
+        AdminCreateLikeIn,
+        AdminPartiallyUpdateLikeIn,
+    ),
     out_schema=CreateLikeOut,
     model=Like,
 )
