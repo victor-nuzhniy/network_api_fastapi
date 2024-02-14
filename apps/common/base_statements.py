@@ -75,7 +75,7 @@ class BaseCRUDStatements(object):
         elif schema is None:
             schema_values = {}
         else:
-            schema_values = schema.model_dump(exclude_unset=True)
+            schema_values = schema.model_dump(exclude_unset=True, exclude_none=True)
         where_expr = []
         if where_data:
             for key, value_data in where_data.items():
