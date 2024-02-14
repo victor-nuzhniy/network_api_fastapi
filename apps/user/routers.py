@@ -9,6 +9,7 @@ from apps.common.schemas import JSENDFailOutSchema, JSENDOutSchema
 from apps.user.handlers import user_handlers
 from apps.user.models import User
 from apps.user.schemas import (
+    AdminPartiallyUserIn,
     AdminUserIn,
     AdminUserOut,
     CreateAdminUserIn,
@@ -20,24 +21,12 @@ users_router = APIRouter()
 
 admin_user_router_initializer = BaseRouterInitializer(  # type: ignore
     router=users_router,
-    in_schema=AdminUserIn,
+    in_schemas=(CreateAdminUserIn, AdminUserIn, AdminPartiallyUserIn),
     out_schema=AdminUserOut,
     model=User,
 )
 
-admin_user_router_initializer.get_read_router()
-admin_user_router_initializer.get_update_router()
-admin_user_router_initializer.get_list_router()
-admin_user_router_initializer.get_delete_router()
-
-create_admin_user_router_initializer = BaseRouterInitializer(  # type: ignore
-    router=users_router,
-    in_schema=CreateAdminUserIn,
-    out_schema=AdminUserOut,
-    model=User,
-)
-
-create_admin_user_router_initializer.get_create_router()
+admin_user_router_initializer.initialize_routers()
 
 
 @users_router.post(
