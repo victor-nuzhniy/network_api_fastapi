@@ -73,6 +73,24 @@ class CreateUserOut(BaseOutSchema):
     ]
 
 
+class AdminPartiallyUserIn(BaseInSchema):
+    """User partially update in schema for admin interface."""
+
+    username: str | None = None
+    email: str | None = None
+    is_active: bool | None = None
+    is_admin: bool | None = None
+
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls, email_value: str) -> str | None:
+        """Validate email field."""
+        if email_value is not None:
+            if not fullmatch(EMAIL_REGEX, email_value):
+                raise ValueError('Invalid email address format')
+            return email_value
+
+
 class AdminUserIn(BaseInSchema):
     """User update in schema for admin interface."""
 
@@ -86,6 +104,14 @@ class AdminUserIn(BaseInSchema):
         bool,
         Field(description='Update user "is_admin" status', examples=[True]),
     ]
+
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls, email_value: str) -> str:
+        """Validate email field."""
+        if not fullmatch(EMAIL_REGEX, email_value):
+            raise ValueError('Invalid email address format')
+        return email_value
 
 
 class CreateAdminUserIn(CreateUserIn):
